@@ -1,0 +1,94 @@
+import os
+import shutil
+# 導入新版 Google GenAI SDK
+from google import genai
+from google.genai import types
+
+# 1. 初始化 Gemini 客戶端
+# 系統會自動讀取您環境變數中的 GEMINI_API_KEY
+client = genai.Client()
+
+SOURCE_DIR = "./unread_files"
+TARGET_DIR = "./classified_knowledge_base"
+
+# 定義我們的知識庫分類目錄
+CATEGORIES = [
+    "01_Teaching_Materials",      # 課程、教材、資管教學
+    "02_Research_Projects",       # 論文、研究、AI工作流、RAG架構
+    "03_Corporate_Governance",    # 董事會、股東、資本額、公司治理
+    "04_Financial_Invoices",      # 發票、收據、報帳經費
+    "05_Unclassified"             # 無法判定的其他檔案
+]
+
+def ask_gemini_to_classify(file_content: str) -> str:
+    """把文件內容丟給 Gemini，讓 AI 決定分類分類夾"""
+    
+    # 建立給 AI 的 Prompt（提示詞），要求它嚴格按照格式回傳
+    prompt = f"""
+    你是一個高效率的檔案管理專家。請分析以下文件的內容，並從規定的分類列表中，選擇一個最適合該文件的分類名稱。
+    
+    【規定的分類列表】:
+    {", ".join(CATEGORIES)}
+    
+    【注意事宜】:
+    1. 只能回傳列表中的其中一個分類名稱，絕對不要包含任何解釋、標點符號或額外文字。
+    2. 如果無法確定，請分類為 "05_Unclassified"。
+    
+    【待分析文件內容】:
+    {file_content}
+    """
+    
+    try:
+        # 使用目前最適合處理文字與邏輯推理的 gemini-2.5-flash 模型
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=prompt,
+        )
+        
+        # 清除前後多餘的空白或換行
+        result = response.text.strip()
+        
+        # 確保 AI 回傳的確在我們的分類清單中
+        if result in CATEGORIES:
+            return result
+        else:
+            print(f"⚠️ AI 回傳了非預期的分類: {result}，將歸入未分類。")
+            return "05_Unclassified"
+            
+    except Exception as e:
+        print(f"🤖 Gemini API 呼叫失敗: {e}")
+        return "05_Unclassified"
+
+def analyze_and_classify_with_ai():
+    if not os.path.exists(SOURCE_DIR):
+        print(f"請先建立來源資料夾 '{SOURCE_DIR}'。")
+        return
+
+    files = [f for f in os.listdir(SOURCE_DIR) if os.path.isfile(os.path.join(SOURCE_DIR, f))]
+    
+    for file_name in files:
+        if file_name.endswith('.txt'):
+            file_path = os.path.join(SOURCE_DIR, file_name)
+            try:
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                
+                print(f"🔍 正在透過 AI 分析檔案: {file_name}...")
+                # 呼叫 AI 進行語意特徵工程分析
+                matched_folder = ask_gemini_to_classify(content)
+                
+                # 搬移檔案
+                dest_folder_path = os.path.join(TARGET_DIR, matched_folder)
+                if not os.path.exists(dest_folder_path):
+                    os.makedirs(dest_folder_path)
+                    
+                shutil.move(file_path, os.path.join(dest_folder_path, file_name))
+                print(f"🤖 AI 自動歸類成功: [{file_name}] -> 移至 [{matched_folder}]\n")
+                
+            except Exception as e:
+                print(f"處理檔案 {file_name} 時發生錯誤: {e}")
+
+if __name__ == "__main__":
+    print("=== 啟動 Gemini AI 智慧檔案歸類系統 ===")
+    analyze_and_classify_with_ai()
+    print("=== 分類程序結束 ===")
