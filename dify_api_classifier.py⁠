@@ -1,0 +1,97 @@
+import os
+import shutil
+import requests
+
+# 1. 設定 Dify API 配置
+DIFY_API_KEY = "您的_DIFY_WORKFLOW_API_SECRET_KEY"  # 請替換為您在 Dify 申請的 Key
+DIFY_API_URL = "https://api.dify.ai/v1/workflows/run" # 預設的 Dify 工作流執行網址
+
+SOURCE_DIR = "./unread_files"
+TARGET_DIR = "./classified_knowledge_base"
+
+# 對應 Dify 條件分支回傳的代碼與本地資料夾名稱
+CATEGORY_MAP = {
+    "01": "01_Teaching_Materials",
+    "02": "02_Research_Projects",
+    "03": "03_Corporate_Governance",
+    "04": "04_Financial_Invoices",
+    "05": "05_Unclassified"
+}
+
+def call_dify_workflow_api(file_path: str) -> str:
+    """將本地檔案上傳並觸發 Dify 工作流 API，取得 AI 分類代碼"""
+    file_name = os.path.basename(file_path)
+    
+    # 設定 API 請求標頭 (Header)
+    headers = {
+        "Authorization": f"Bearer {DIFY_API_KEY}"
+    }
+    
+    # 這裡的 inputs 對應您在 Dify 開始節點設定的變數名稱
+    # 注意：若 Dify 支援直接傳入 File 變數，可透過 files 參數傳遞
+    try:
+        with open(file_path, 'rb') as f:
+            # 準備傳送給 Dify 的多部分表單資料 (Multipart Form Data)
+            # 根據 Dify 的 API 規範，工作流若需要檔案輸入，通常會先呼叫 /files/upload 介面，
+            # 或是直接在 inputs 中帶入文字。此處以傳送檔案流或引導文字為示範：
+            
+            print(f"📡 正在將發送檔案特徵至 Dify 雲端工作流: {file_name}...")
+            
+            # 範例：呼叫 Dify 工作流並帶入必要參數
+            # 提示：實際傳輸時，若檔案過大，建議在本地先提取文字，或使用 Dify 專用的檔案上傳 API
+            data = {
+                "inputs": {
+                    "document_name": file_name
+                },
+                "response_mode": "blocking", # 使用阻塞模式，等待 AI 執行完畢直接回傳結果
+                "user": "professor_chen"      # 用戶識別碼，可自訂
+            }
+            
+            # 若您的 Dify 工作流直接接收文字特徵，建議在本地提取文字後，放入 inputs 參數中傳送：
+            # data["inputs"]["document_content"] = extracted_text
+            
+            response = requests.post(DIFY_API_URL, headers=headers, json=data)
+            
+            if response.status_code == 200:
+                res_json = response.json()
+                # 解析 Dify 工作流輸出節點 (End Node) 回傳的結果
+                # 假設您的 Dify 結束節點輸出了名為 "category_code" 的變數
+                outputs = res_json.get("data", {}).get("outputs", {})
+                category_code = outputs.get("category_code", "05")
+                return category_code
+            else:
+                print(f"❌ Dify API 回傳錯誤碼: {response.status_code}, 內容: {response.text}")
+                return "05"
+                
+    except Exception as e:
+        print(f"🤖 串接 Dify 工作流時發生異常: {e}")
+        return "05"
+
+def main_workflow_processor():
+    if not os.path.exists(SOURCE_DIR):
+        print(f"請先建立來源資料夾 '{SOURCE_DIR}'。")
+        return
+
+    files = [f for f in os.listdir(SOURCE_DIR) if os.path.isfile(os.path.join(SOURCE_DIR, f))]
+    
+    for file_name in files:
+        file_path = os.path.join(SOURCE_DIR, file_name)
+        
+        # 呼叫雲端 Dify 工作流，讓 Gemini 進行智慧分析
+        category_code = call_dify_workflow_api(file_path)
+        
+        # 對照本地資料夾名稱
+        matched_folder = CATEGORY_MAP.get(category_code, "05_Unclassified")
+        
+        # 執行本地實體檔案搬移，優化知識庫結構
+        dest_folder_path = os.path.join(TARGET_DIR, matched_folder)
+        if not os.path.exists(dest_folder_path):
+            os.makedirs(dest_folder_path)
+            
+        shutil.move(file_path, os.path.join(dest_folder_path, file_name))
+        print(f"🎯 雲端協調完成！本地檔案 [{file_name}] ➔ 移至 [{matched_folder}]\n")
+
+if __name__ == "__main__":
+    print("=== 啟動 Dify API 混合雲端檔案智慧歸類系統 ===")
+    main_workflow_processor()
+    print("=== 程序結束 ===")
