@@ -1,0 +1,74 @@
+import os
+import shutil
+
+# 1. 定義要掃描的來源資料夾，以及分類後的目標資料夾路徑
+SOURCE_DIR = "./unread_files"
+TARGET_DIR = "./classified_knowledge_base"
+
+# 2. 定義關鍵字分類規則 (特徵工程邏輯)
+# 鍵 (Key) 是資料夾名稱，值 (Value) 是觸發分類的關鍵字列表
+CLASSIFICATION_RULES = {
+    "01_Teaching_Materials": ["課程", "教學", "教授", "課表", "知識管理", "資管"],
+    "02_Research_Projects": ["論文", "研究", "AI工作流", "RAG", "模型", "實驗"],
+    "03_Corporate_Governance": ["董事會", "股東", "資本額", "會議記錄", "決議"],
+    "04_Financial_Invoices": ["發票", "收據", "款項", "報帳", "經費"]
+}
+
+def setup_folders():
+    """確保目標資料夾都已建立"""
+    if not os.path.exists(TARGET_DIR):
+        os.makedirs(TARGET_DIR)
+    for folder in CLASSIFICATION_RULES.keys():
+        folder_path = os.path.join(TARGET_DIR, folder)
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
+            print(f"已建立分類資料夾: {folder}")
+
+def analyze_and_classify():
+    """分析檔案內容並進行自動歸類"""
+    if not os.path.exists(SOURCE_DIR):
+        print(f"請先建立來源資料夾 '{SOURCE_DIR}' 並放入要測試的 txt 檔案。")
+        return
+
+    # 讀取來源資料夾內的所有檔案
+    files = [f for f in os.listdir(SOURCE_DIR) if os.path.isfile(os.path.join(SOURCE_DIR, f))]
+    
+    if not files:
+        print("沒有找到需要分類的檔案。")
+        return
+
+    for file_name in files:
+        file_path = os.path.join(SOURCE_DIR, file_name)
+        
+        # 目前僅針對純文字檔 (.txt) 進行內容語意分析
+        if file_name.endswith('.txt'):
+            try:
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                
+                matched_folder = "05_Unclassified" # 預設分類（未分類）
+                
+                # 掃描規則，比對關鍵字
+                for folder, keywords in CLASSIFICATION_RULES.items():
+                    if any(keyword in content for keyword in keywords):
+                        matched_folder = folder
+                        break # 匹配到第一個規則就跳出
+                
+                # 執行檔案搬移
+                dest_folder_path = os.path.join(TARGET_DIR, matched_folder)
+                if not os.path.exists(dest_folder_path):
+                    os.makedirs(dest_folder_path)
+                    
+                shutil.move(file_path, os.path.join(dest_folder_path, file_name))
+                print(f"成功歸類: [{file_name}] -> 移至 [{matched_folder}]")
+                
+            except Exception as e:
+                print(f"處理檔案 {file_name} 時發生錯誤: {e}")
+        else:
+            print(f"不支援的檔案格式（略過）: {file_name}")
+
+if __name__ == "__main__":
+    print("=== 啟動智慧檔案自動歸類系統 ===")
+    setup_folders()
+    analyze_and_classify()
+    print("=== 分類程序結束 ===")
