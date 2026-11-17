@@ -68,14 +68,16 @@ python -m pcs.eval.run_eval                 # 消融實驗，結果輸出到 res
 ## 依週次對應
 
 1. **第 1–2 週：環境與資料準備**
-   - 用 `docker compose up -d ollama` 啟動 Ollama，再執行 `./scripts/pull_models.sh` 下載模型。預設模型為 `qwen2.5:7b-instruct` 與 `bge-m3`。
+   - 預設使用**電腦上已安裝的 Ollama**：先執行 `ollama pull qwen2.5:7b-instruct` 和 `ollama pull bge-m3`。容器透過 `host.docker.internal` 連到它，不用重複下載模型，Mac 也能用到 GPU。
+   - Linux 上的 Ollama 預設只聽 127.0.0.1，容器連不到。請用 `OLLAMA_HOST=0.0.0.0 ollama serve` 啟動。
+   - 電腦上沒有 Ollama 時，改用容器版：先關掉電腦上的 Ollama（避免 11434 連接埠衝突），再執行 `OLLAMA_HOST=http://ollama:11434 docker compose --profile docker-ollama up -d`，然後執行 `./scripts/pull_models.sh`。
    - 題庫在 `data/corpus/` 與 `data/testset/cases.jsonl`。
 2. **第 3–5 週：LightRAG 與 MCP**
    - 執行 `docker compose run --rm kg-build` 建庫。它會用 hybrid 模式查詢，驗證是否同時取回 A 與 B。
    - 啟動 MCP Server：`docker compose up -d kg-mcp`，服務位址為 `http://localhost:8100/mcp`。
    - 也可以改用 `--transport stdio`，直接接到 Claude Desktop 或 MCP Inspector。
 3. **第 6–8 週：A2A 多代理**
-   - 啟動代理：`docker compose up -d legal-agent finance-agent coordinator`。
+   - 啟動代理：`docker compose up -d`（MCP Server 與三個代理一起啟動）。
    - 執行 `./scripts/a2a_smoke.sh` 測試。它會讀取 Agent Card、用 `message/send` 建立任務，再用 `tasks/get` 輪詢狀態。
 4. **第 9–10 週：消融實驗**
    - 執行 `docker compose run --rm eval`，或在本機執行 `PCS_REASONER=llm PCS_KG_BACKEND=lightrag python -m pcs.eval.run_eval --repeats 3`。

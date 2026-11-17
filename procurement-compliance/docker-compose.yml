@@ -1,11 +1,17 @@
 # 第 1–2 週：本機 Ollama + Docker 環境
-# 啟動： docker compose up -d ollama && ./scripts/pull_models.sh
-#        docker compose run --rm kg-build          # LightRAG 建庫（第 3–5 週）
-#        docker compose up -d kg-mcp legal-agent finance-agent coordinator
+#
+# 預設：容器直接使用「電腦上已安裝的 Ollama」（不重複下載模型；Mac 也能用到 GPU）
+#   ollama pull qwen2.5:7b-instruct && ollama pull bge-m3
+#   docker compose run --rm kg-build          # LightRAG 建庫（第 3–5 週）
+#   docker compose up -d                      # MCP Server + 三個代理
+#
+# 若電腦上沒有 Ollama，改用容器版（請先關閉電腦上的 Ollama，避免 11434 連接埠衝突）：
+#   OLLAMA_HOST=http://ollama:11434 docker compose --profile docker-ollama up -d
+#   ./scripts/pull_models.sh
 x-app: &app
   build: { context: ., dockerfile: docker/Dockerfile }
   environment: &env
-    OLLAMA_HOST: http://ollama:11434
+    OLLAMA_HOST: ${OLLAMA_HOST:-http://host.docker.internal:11434}
     PCS_KG_BACKEND: ${PCS_KG_BACKEND:-lightrag}
     PCS_REASONER: ${PCS_REASONER:-llm}
     PCS_LLM_MODEL: ${PCS_LLM_MODEL:-qwen2.5:7b-instruct}
@@ -18,10 +24,12 @@ x-app: &app
   volumes:
     - ./rag_storage:/app/rag_storage
     - ./results:/app/results
-  depends_on: [ollama]
+  extra_hosts:
+    - "host.docker.internal:host-gateway"  # Linux 需要；Mac / Windows 內建
 
 services:
   ollama:
+    profiles: [docker-ollama]
     image: ollama/ollama:latest
     ports: ["11434:11434"]
     volumes: [ollama:/root/.ollama]
