@@ -1,0 +1,9 @@
+fastapi>=0.110
+uvicorn>=0.29
+httpx>=0.27
+numpy>=1.26
+mcp>=2.0
+# 第 3–5 週起使用真正的 LightRAG（PCS_KG_BACKEND=lightrag）
+lightrag-hku>=1.4
+ollama>=0.4
+pytest>=8

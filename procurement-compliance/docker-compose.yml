@@ -1,0 +1,68 @@
+# 第 1–2 週：本機 Ollama + Docker 環境
+# 啟動： docker compose up -d ollama && ./scripts/pull_models.sh
+#        docker compose run --rm kg-build          # LightRAG 建庫（第 3–5 週）
+#        docker compose up -d kg-mcp legal-agent finance-agent coordinator
+x-app: &app
+  build: { context: ., dockerfile: docker/Dockerfile }
+  environment: &env
+    OLLAMA_HOST: http://ollama:11434
+    PCS_KG_BACKEND: ${PCS_KG_BACKEND:-lightrag}
+    PCS_REASONER: ${PCS_REASONER:-llm}
+    PCS_LLM_MODEL: ${PCS_LLM_MODEL:-qwen2.5:7b-instruct}
+    PCS_EMBED_MODEL: ${PCS_EMBED_MODEL:-bge-m3}
+    PCS_EMBED_DIM: ${PCS_EMBED_DIM:-1024}
+    PCS_LIGHTRAG_WORKDIR: /app/rag_storage
+    PCS_MCP_URL: http://kg-mcp:8100/mcp
+    PCS_LEGAL_URL: http://legal-agent:8201
+    PCS_FINANCE_URL: http://finance-agent:8202
+  volumes:
+    - ./rag_storage:/app/rag_storage
+    - ./results:/app/results
+  depends_on: [ollama]
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    ports: ["11434:11434"]
+    volumes: [ollama:/root/.ollama]
+    # 有 NVIDIA GPU 時取消註解
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices: [{ driver: nvidia, count: all, capabilities: [gpu] }]
+
+  kg-build:
+    <<: *app
+    profiles: [tools]
+    command: python -m pcs.kg.build
+
+  kg-mcp:
+    <<: *app
+    ports: ["8100:8100"]
+    command: python -m pcs.mcp_server.server --transport streamable-http --port 8100
+
+  legal-agent:
+    <<: *app
+    ports: ["8201:8201"]
+    command: python -m pcs.agents.legal --port 8201
+    depends_on: [kg-mcp]
+
+  finance-agent:
+    <<: *app
+    ports: ["8202:8202"]
+    command: python -m pcs.agents.finance --port 8202
+    depends_on: [kg-mcp]
+
+  coordinator:
+    <<: *app
+    ports: ["8200:8200"]
+    command: python -m pcs.agents.coordinator --port 8200
+    depends_on: [legal-agent, finance-agent]
+
+  eval:
+    <<: *app
+    profiles: [tools]
+    command: python -m pcs.eval.run_eval --repeats 3
+
+volumes:
+  ollama:
