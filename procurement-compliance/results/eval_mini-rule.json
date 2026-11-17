@@ -1,0 +1,459 @@
+{
+  "summary": {
+    "single-naive": {
+      "n": 6,
+      "verdict_accuracy": 0.0,
+      "conflict_detection_rate": 0.0,
+      "rule_recall": 0.0,
+      "doc_recall": 0.4444444444444444,
+      "hallucination_rate": 0.0,
+      "hallucinated_cases": 0.0,
+      "avg_latency_s": 0.00024904299995872253
+    },
+    "single-hybrid": {
+      "n": 6,
+      "verdict_accuracy": 0.6666666666666666,
+      "conflict_detection_rate": 0.25,
+      "rule_recall": 0.7777777777777778,
+      "doc_recall": 1.0,
+      "hallucination_rate": 0.0,
+      "hallucinated_cases": 0.0,
+      "avg_latency_s": 0.00012018433333575255
+    },
+    "a2a-naive": {
+      "n": 6,
+      "verdict_accuracy": 1.0,
+      "conflict_detection_rate": 1.0,
+      "rule_recall": 1.0,
+      "doc_recall": 1.0,
+      "hallucination_rate": 0.0,
+      "hallucinated_cases": 0.0,
+      "avg_latency_s": 0.2036738541666523
+    },
+    "a2a-hybrid": {
+      "n": 6,
+      "verdict_accuracy": 1.0,
+      "conflict_detection_rate": 1.0,
+      "rule_recall": 1.0,
+      "doc_recall": 1.0,
+      "hallucination_rate": 0.0,
+      "hallucinated_cases": 0.0,
+      "avg_latency_s": 0.20363655366666458
+    }
+  },
+  "details": {
+    "single-naive": [
+      {
+        "id": "T01",
+        "expected": "CONDITIONAL",
+        "verdict": "UNKNOWN",
+        "correct": false,
+        "has_conflict": true,
+        "conflict_detected": false,
+        "rule_recall": 0.0,
+        "doc_recall": 0.3333333333333333,
+        "cited": [],
+        "unsupported": [],
+        "n_cited": 0,
+        "latency_s": 0.0005305399999997462
+      },
+      {
+        "id": "T02",
+        "expected": "VIOLATION",
+        "verdict": "UNKNOWN",
+        "correct": false,
+        "has_conflict": false,
+        "conflict_detected": false,
+        "rule_recall": 0.0,
+        "doc_recall": 0.5,
+        "cited": [],
+        "unsupported": [],
+        "n_cited": 0,
+        "latency_s": 0.00025350799990064843
+      },
+      {
+        "id": "T03",
+        "expected": "VIOLATION",
+        "verdict": "UNKNOWN",
+        "correct": false,
+        "has_conflict": true,
+        "conflict_detected": false,
+        "rule_recall": 0.0,
+        "doc_recall": 0.3333333333333333,
+        "cited": [],
+        "unsupported": [],
+        "n_cited": 0,
+        "latency_s": 0.00018603299997721479
+      },
+      {
+        "id": "T04",
+        "expected": "VIOLATION",
+        "verdict": "UNKNOWN",
+        "correct": false,
+        "has_conflict": true,
+        "conflict_detected": false,
+        "rule_recall": 0.0,
+        "doc_recall": 0.6666666666666666,
+        "cited": [],
+        "unsupported": [],
+        "n_cited": 0,
+        "latency_s": 0.00018308099993191718
+      },
+      {
+        "id": "T05",
+        "expected": "VIOLATION",
+        "verdict": "UNKNOWN",
+        "correct": false,
+        "has_conflict": true,
+        "conflict_detected": false,
+        "rule_recall": 0.0,
+        "doc_recall": 0.3333333333333333,
+        "cited": [],
+        "unsupported": [],
+        "n_cited": 0,
+        "latency_s": 0.00017651500002102694
+      },
+      {
+        "id": "T06",
+        "expected": "COMPLIANT",
+        "verdict": "UNKNOWN",
+        "correct": false,
+        "has_conflict": false,
+        "conflict_detected": false,
+        "rule_recall": 0.0,
+        "doc_recall": 0.5,
+        "cited": [],
+        "unsupported": [],
+        "n_cited": 0,
+        "latency_s": 0.00016458099992178177
+      }
+    ],
+    "single-hybrid": [
+      {
+        "id": "T01",
+        "expected": "CONDITIONAL",
+        "verdict": "VIOLATION",
+        "correct": false,
+        "has_conflict": true,
+        "conflict_detected": false,
+        "rule_recall": 0.6666666666666666,
+        "doc_recall": 1.0,
+        "cited": [
+          "A-3",
+          "B-3"
+        ],
+        "unsupported": [],
+        "n_cited": 2,
+        "latency_s": 0.00023413099995650555
+      },
+      {
+        "id": "T02",
+        "expected": "VIOLATION",
+        "verdict": "VIOLATION",
+        "correct": true,
+        "has_conflict": false,
+        "conflict_detected": true,
+        "rule_recall": 1.0,
+        "doc_recall": 1.0,
+        "cited": [
+          "A-3"
+        ],
+        "unsupported": [],
+        "n_cited": 1,
+        "latency_s": 9.360000001379376e-05
+      },
+      {
+        "id": "T03",
+        "expected": "VIOLATION",
+        "verdict": "VIOLATION",
+        "correct": true,
+        "has_conflict": true,
+        "conflict_detected": true,
+        "rule_recall": 1.0,
+        "doc_recall": 1.0,
+        "cited": [
+          "A-3",
+          "B-3"
+        ],
+        "unsupported": [],
+        "n_cited": 2,
+        "latency_s": 0.00011305400005312549
+      },
+      {
+        "id": "T04",
+        "expected": "VIOLATION",
+        "verdict": "COMPLIANT",
+        "correct": false,
+        "has_conflict": true,
+        "conflict_detected": false,
+        "rule_recall": 0.5,
+        "doc_recall": 1.0,
+        "cited": [
+          "A-2",
+          "A-3"
+        ],
+        "unsupported": [],
+        "n_cited": 2,
+        "latency_s": 9.514900000340276e-05
+      },
+      {
+        "id": "T05",
+        "expected": "VIOLATION",
+        "verdict": "VIOLATION",
+        "correct": true,
+        "has_conflict": true,
+        "conflict_detected": false,
+        "rule_recall": 0.5,
+        "doc_recall": 1.0,
+        "cited": [
+          "A-3",
+          "B-3"
+        ],
+        "unsupported": [],
+        "n_cited": 2,
+        "latency_s": 0.00010330899999644316
+      },
+      {
+        "id": "T06",
+        "expected": "COMPLIANT",
+        "verdict": "COMPLIANT",
+        "correct": true,
+        "has_conflict": false,
+        "conflict_detected": true,
+        "rule_recall": 1.0,
+        "doc_recall": 1.0,
+        "cited": [
+          "A-2",
+          "A-3"
+        ],
+        "unsupported": [],
+        "n_cited": 2,
+        "latency_s": 8.186299999124458e-05
+      }
+    ],
+    "a2a-naive": [
+      {
+        "id": "T01",
+        "expected": "CONDITIONAL",
+        "verdict": "CONDITIONAL",
+        "correct": true,
+        "has_conflict": true,
+        "conflict_detected": true,
+        "rule_recall": 1.0,
+        "doc_recall": 1.0,
+        "cited": [
+          "A-3",
+          "A-5",
+          "B-1",
+          "B-3",
+          "B-4",
+          "B-5"
+        ],
+        "unsupported": [],
+        "n_cited": 6,
+        "latency_s": 0.20512834399994517
+      },
+      {
+        "id": "T02",
+        "expected": "VIOLATION",
+        "verdict": "VIOLATION",
+        "correct": true,
+        "has_conflict": false,
+        "conflict_detected": true,
+        "rule_recall": 1.0,
+        "doc_recall": 1.0,
+        "cited": [
+          "A-3"
+        ],
+        "unsupported": [],
+        "n_cited": 1,
+        "latency_s": 0.20305846799999472
+      },
+      {
+        "id": "T03",
+        "expected": "VIOLATION",
+        "verdict": "VIOLATION",
+        "correct": true,
+        "has_conflict": true,
+        "conflict_detected": true,
+        "rule_recall": 1.0,
+        "doc_recall": 1.0,
+        "cited": [
+          "A-3",
+          "A-5",
+          "B-1",
+          "B-3",
+          "B-4",
+          "B-5"
+        ],
+        "unsupported": [],
+        "n_cited": 6,
+        "latency_s": 0.20298827099998107
+      },
+      {
+        "id": "T04",
+        "expected": "VIOLATION",
+        "verdict": "VIOLATION",
+        "correct": true,
+        "has_conflict": true,
+        "conflict_detected": true,
+        "rule_recall": 1.0,
+        "doc_recall": 1.0,
+        "cited": [
+          "A-3",
+          "A-4"
+        ],
+        "unsupported": [],
+        "n_cited": 2,
+        "latency_s": 0.20274590500002887
+      },
+      {
+        "id": "T05",
+        "expected": "VIOLATION",
+        "verdict": "VIOLATION",
+        "correct": true,
+        "has_conflict": true,
+        "conflict_detected": true,
+        "rule_recall": 1.0,
+        "doc_recall": 1.0,
+        "cited": [
+          "A-3",
+          "B-3",
+          "B-4"
+        ],
+        "unsupported": [],
+        "n_cited": 3,
+        "latency_s": 0.20465544299997873
+      },
+      {
+        "id": "T06",
+        "expected": "COMPLIANT",
+        "verdict": "COMPLIANT",
+        "correct": true,
+        "has_conflict": false,
+        "conflict_detected": true,
+        "rule_recall": 1.0,
+        "doc_recall": 1.0,
+        "cited": [
+          "A-2",
+          "A-3"
+        ],
+        "unsupported": [],
+        "n_cited": 2,
+        "latency_s": 0.20346669399998518
+      }
+    ],
+    "a2a-hybrid": [
+      {
+        "id": "T01",
+        "expected": "CONDITIONAL",
+        "verdict": "CONDITIONAL",
+        "correct": true,
+        "has_conflict": true,
+        "conflict_detected": true,
+        "rule_recall": 1.0,
+        "doc_recall": 1.0,
+        "cited": [
+          "A-3",
+          "A-5",
+          "B-1",
+          "B-3",
+          "B-4",
+          "B-5"
+        ],
+        "unsupported": [],
+        "n_cited": 6,
+        "latency_s": 0.2042464569999538
+      },
+      {
+        "id": "T02",
+        "expected": "VIOLATION",
+        "verdict": "VIOLATION",
+        "correct": true,
+        "has_conflict": false,
+        "conflict_detected": true,
+        "rule_recall": 1.0,
+        "doc_recall": 1.0,
+        "cited": [
+          "A-3"
+        ],
+        "unsupported": [],
+        "n_cited": 1,
+        "latency_s": 0.20349556500002564
+      },
+      {
+        "id": "T03",
+        "expected": "VIOLATION",
+        "verdict": "VIOLATION",
+        "correct": true,
+        "has_conflict": true,
+        "conflict_detected": true,
+        "rule_recall": 1.0,
+        "doc_recall": 1.0,
+        "cited": [
+          "A-3",
+          "A-5",
+          "B-1",
+          "B-3",
+          "B-4",
+          "B-5"
+        ],
+        "unsupported": [],
+        "n_cited": 6,
+        "latency_s": 0.20392748500000835
+      },
+      {
+        "id": "T04",
+        "expected": "VIOLATION",
+        "verdict": "VIOLATION",
+        "correct": true,
+        "has_conflict": true,
+        "conflict_detected": true,
+        "rule_recall": 1.0,
+        "doc_recall": 1.0,
+        "cited": [
+          "A-3",
+          "A-4"
+        ],
+        "unsupported": [],
+        "n_cited": 2,
+        "latency_s": 0.20337481499996102
+      },
+      {
+        "id": "T05",
+        "expected": "VIOLATION",
+        "verdict": "VIOLATION",
+        "correct": true,
+        "has_conflict": true,
+        "conflict_detected": true,
+        "rule_recall": 1.0,
+        "doc_recall": 1.0,
+        "cited": [
+          "A-3",
+          "B-3",
+          "B-4"
+        ],
+        "unsupported": [],
+        "n_cited": 3,
+        "latency_s": 0.20290244800003165
+      },
+      {
+        "id": "T06",
+        "expected": "COMPLIANT",
+        "verdict": "COMPLIANT",
+        "correct": true,
+        "has_conflict": false,
+        "conflict_detected": true,
+        "rule_recall": 1.0,
+        "doc_recall": 1.0,
+        "cited": [
+          "A-2",
+          "A-3"
+        ],
+        "unsupported": [],
+        "n_cited": 2,
+        "latency_s": 0.2038725520000071
+      }
+    ]
+  }
+}
